@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<style>
+    body{
+        padding: 20px;
+    }
+    .card_list{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    /* .card_list .card{
+        width: 250px;
+    } */
+</style>
+<body>
+    <button onclick="getAllPeople()" class="btn btn-primary">getAllPeople</button>
+    <button onclick="getAllFilms()" class="btn btn-primary">getAllFilms</button>
+    <br><br><br>
+    <input type="text" name="item_id" id="item_id" placeholder="Person/film id/search">
+    <br><br>
+    <button onclick="getPersonById(document.querySelector('#item_id').value);document.querySelector('#item_id').value =''" class="btn btn-primary">getPersonById</button>
+    <button onclick="getFilm(document.querySelector('#item_id').value);document.querySelector('#item_id').value =''" class="btn btn-primary">getFilm</button>
+    <br><br>
+    <button onclick="searchPeople(document.querySelector('#item_id').value);document.querySelector('#item_id').value =''" class="btn btn-primary">searchPeople</button>
+    <button onclick="searchFilms(document.querySelector('#item_id').value);document.querySelector('#item_id').value =''" class="btn btn-primary">searchFilms</button>
+    <div id="cards_list" class="card_list"></div>
+    <script>
+
+const createCard = (imgSrc, title, text, btnText) => {
+    let div = document.createElement('div');
+    let img = document.createElement('img');
+
+    let div_c_body = document.createElement('div');
+    let h5 = document.createElement('h5');
+    let p = document.createElement('p');
+    let a = document.createElement('a');
+
+    div.style.width = '18rem';
+    div.classList.add('card');
+
+    img.setAttribute('src', imgSrc);
+    img.setAttribute('alt', title);
+    img.classList.add('card-img-top');
+
+    div_c_body.classList.add('card-body');
+
+    h5.textContent = title;
+    h5.classList.add('card-title');
+
+    p.textContent = text;
+    p.classList.add('card-text')
+
+    a.textContent = btnText;
+    a.setAttribute('href', '#');
+    a.classList.add('btn', 'btn-primary');
+
+    div_c_body.append(h5, p, a);
+    div.append(img, div_c_body);
+
+
+    return div;
+}
+
+const displayItems = (data) => {
+    document.querySelector('#cards_list').innerHTML = '';
+    for(let i = 0; i < data.results.length; i++){
+        document.querySelector('#cards_list').appendChild(createCard('https://th.bing.com/th/id/R.9d78e1dca54a95cf569d8589565df082?rik=iagJ2%2fi%2fwGtKTQ&pid=ImgRaw&r=0', data.results[i].name, data.results[i].gender, 'Button'));
+    }
+}
+const displayFilms = (data) => {
+    document.querySelector('#cards_list').innerHTML = '';
+    for(let i = 0; i < data.results.length; i++){
+        document.querySelector('#cards_list').appendChild(createCard('https://th.bing.com/th/id/R.24b2f42608ffbbf456d0b947a875cb21?rik=J2fi4xFioaGgsw&riu=http%3a%2f%2fwww.5minutesformom.com%2fwp-content%2fuploads%2f2015%2f08%2fStar-Wars-Logo.png&ehk=VBbM5UDXGO4YNHgw7swjYp191i0QBPz98WPjXhtOsGw%3d&risl=&pid=ImgRaw&r=0', data.results[i].title, data.results[i].opening_crawl, 'Button'));
+    }
+}
+
+
+const getData = async (url) => {
+    document.querySelector('#cards_list').innerHTML = 'loading...';
+    const reqURL = url;
+    const req = new Request(reqURL);
+    const response = await fetch(req);
+    const data = await response.json();
+    console.log(data);
+    return data;
+}
+
+const getAllPeople = async () => {
+    let data = await getData('https://swapi.dev/api/people/?format=json');
+    displayItems(data);
+}
+
+const getPersonById = async (id) => {
+    let data = await getData('https://swapi.dev/api/people/'+id+'/?format=json');
+    document.querySelector('#cards_list').innerHTML = '';
+    document.querySelector('#cards_list').appendChild(createCard('https://th.bing.com/th/id/R.9d78e1dca54a95cf569d8589565df082?rik=iagJ2%2fi%2fwGtKTQ&pid=ImgRaw&r=0', data.name, data.gender, 'Button'));
+}
+
+const getAllFilms = async () => {
+    let data = await getData('https://swapi.dev/api/films/?format=json');
+    displayFilms(data);
+}
+
+const getFilm = async (id) => {
+    let data = await getData('https://swapi.dev/api/films/'+id+'/?format=json');
+    document.querySelector('#cards_list').innerHTML = '';
+    document.querySelector('#cards_list').appendChild(createCard('https://th.bing.com/th/id/R.24b2f42608ffbbf456d0b947a875cb21?rik=J2fi4xFioaGgsw&riu=http%3a%2f%2fwww.5minutesformom.com%2fwp-content%2fuploads%2f2015%2f08%2fStar-Wars-Logo.png&ehk=VBbM5UDXGO4YNHgw7swjYp191i0QBPz98WPjXhtOsGw%3d&risl=&pid=ImgRaw&r=0', data.title, data.opening_crawl, 'Button'));
+}
+
+
+const searchPeople = async (search) => {
+    let data = await getData('https://swapi.dev/api/people/?format=json&search='+search+'');
+    data.count ? displayItems(data) : document.querySelector('#cards_list').innerHTML = 'Information not found';
+    
+}
+
+
+const searchFilms = async (search) => {
+    let data = await getData('https://swapi.dev/api/films/?format=json&search='+search+'');
+    data.count ? displayfilms(data) : document.querySelector('#cards_list').innerHTML = 'Information not found';
+}
+
+
+
+            // const getData = async (url) => {
+            //     fetch(url)
+            //         .then((response) => response.json())
+            //         .then((data) => {
+            //             // console.log(data);
+            //             return data;
+            //         });
+            // }
+
+
+            // const printData = async () => {
+            //     const a = await getData('https://raw.githubusercontent.com/danielpsev/json/main/data.json');
+            //     console.log(a);
+            // }
+
+        // const getAllPeople = async () => {
+            
+        //     // displayItems(data.results);
+        // }
+
+
+        // const getPersonById = async (id) => {
+        //     const reqURL = 'https://swapi.dev/api/people/'+id+'/?format=json';
+        //     const req = new Request(reqURL);
+
+        //     const response = await fetch(req);
+        //     const data = await response.json();
+        //     console.log(data);
+        //     displayItems(data.results);
+        // }
+
+
+    </script>
+</body>
+</html>
