@@ -126,7 +126,7 @@ const searchPeople = async (search) => {
 
 const searchFilms = async (search) => {
     let data = await getData('https://swapi.dev/api/films/?format=json&search='+search+'');
-    data.count ? displayfilms(data) : document.querySelector('#cards_list').innerHTML = 'Information not found';
+    data.count ? displayFilms(data) : document.querySelector('#cards_list').innerHTML = 'Information not found';
 }
 
 
